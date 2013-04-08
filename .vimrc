@@ -1,27 +1,61 @@
-"golang
-"
+
 set rtp+=$GOROOT/misc/vim
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 显示相关  
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set cul "高亮光标所在行
-set shortmess=atI   " 启动的时候不显示那个援助乌干达儿童的提示  
-set go=             " 不要图形按钮  
-"color desert     " 设置背景主题  
-color ron     " 设置背景主题  
-"color torte     " 设置背景主题  
-"set guifont=Courier_New:h10:cANSI   " 设置字体  
-"autocmd InsertLeave * se nocul  " 用浅色高亮当前行  
-autocmd InsertEnter * se cul    " 用浅色高亮当前行  
-set ruler           " 显示标尺  
-set showcmd         " 输入的命令显示出来，看的清楚些  
-"set whichwrap+=<,>,h,l   " 允许backspace和光标键跨越行边界(不建议)  
-set scrolloff=3     " 光标移动到buffer的顶部和底部时保持3行距离  
-set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}   "状态行显示的内容  
-set laststatus=2    " 启动显示状态行(1),总是显示状态行(2)  
-"set foldenable      " 允许折叠  
-""set foldmethod=manual   " 手动折叠  
-set nocompatible  "去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限  
+
+
+" mapleader指定<leader>, 默认为\
+let mapleader = ","
+map <silent> <leader>ee :e ~/.vimrc<cr>
+" .vimrc编辑保存后自动加载
+autocmd! bufwritepost .vimrc source ~/.vimrc
+
+" 希望在session文件中不保存当前路径
+" 而是希望session文件所在的目录自动成为当前工作目录
+set sessionoptions-=curdir
+set sessionoptions+=sesdir
+" 希望会话文件可以同时被windows版本的vim和UNIX版本的vim共同使用
+" slash：把文件名中的'\'替换为'/'
+" unix：把会话文件的换行符保存成unix格式
+set sessionoptions+=slash
+set sessionoptions+=unix
+
+
+"""""""""""""""""""""""""""
+" 显示相关
+"""""""""""""""""""""""""""
+" 高亮光标所在行
+set cul
+" 启动的时候不显示那个援助乌干达儿童的提示
+set shortmess=atI
+" 不要图形按钮
+set go=
+" 设置背景主题
+" color desert
+" 设置背景主题
+color ron
+" 设置背景主题
+" color torte
+" 设置字体
+"set guifont=Courier_New:h10:cANSI
+" 用浅色高亮当前行
+autocmd InsertEnter * se cul
+" 显示标尺
+set ruler
+" 输入的命令显示出来，看的清楚些
+set showcmd
+" 允许backspace和光标键跨越行边界(不建议)
+"set whichwrap+=<,>,h,l
+" 光标移动到buffer的顶部和底部时保持3行距离
+set scrolloff=3
+"状态行显示的内容
+set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}
+" 启动显示状态行(1),总是显示状态行(2)
+set laststatus=2
+" 允许折叠
+"set foldenable
+" 手动折叠
+"set foldmethod=manual
+"去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+set nocompatible
 " 显示中文帮助
 if version >= 603
 	set helplang=cn
@@ -43,12 +77,14 @@ set smarttab
 set number
 " 历史记录数
 set history=1000
-"搜索逐字符高亮
+" 搜索逐字符高亮
 set hlsearch
 set incsearch
-"语言设置
+" 语言设置
 set langmenu=zh_CN.UTF-8
 set helplang=cn
+" 把时间strftime()的语言格式设置为en
+:language time en_US.utf8
 " 总是显示状态行
 set cmdheight=2
 " 侦测文件类型
@@ -63,70 +99,73 @@ set viminfo+=!
 set iskeyword+=_,$,@,%,#,-
 " 字符间插入的像素行数目
 
-"markdown配置
+" markdown配置
 au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
 au BufRead,BufNewFile *.{go}   set filetype=go
-"rkdown to HTML  
+" rkdown to HTML
 nmap md :!~/.vim/markdown.pl % > %.html <CR><CR>
 nmap fi :!firefox %.html & <CR><CR>
 
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""新文件标题
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"新建.c,.h,.sh,.java文件，自动插入文件头 
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java,*.py,*.md exec ":call SetTitle()" 
-""定义函数SetTitle，自动插入文件头 
-func SetTitle() 
-	"如果文件类型为.sh文件 
-	if &filetype == 'sh' 
-		call setline(1,"\#########################################################################") 
-		call append(line("."), "\# File Name: ".expand("%")) 
-		call append(line(".")+1, "\# Author: ma6174") 
-		call append(line(".")+2, "\# mail: ma6174@163.com") 
-		call append(line(".")+3, "\# Created Time: ".strftime("%c")) 
-		call append(line(".")+4, "\#########################################################################") 
-		call append(line(".")+5, "\#!/bin/bash") 
-		call append(line(".")+6, "") 
+"""""""""""""""""""
+" 新文件标题
+"""""""""""""""""""
+" 新建.c,.h,.sh,.java文件，自动插入文件头
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java,*.py,*.md exec ":call SetTitle()"
+" 定义函数SetTitle，自动插入文件头
+func! SetTitle()
+	" 如果文件类型为.sh文件
+	if &filetype == 'sh'
+		call setline(1,"\#########################################################################")
+		call append(line("."), "\# File Name: ".expand("%"))
+		call append(line(".")+1, "\# Author: jphome")
+		call append(line(".")+2, "\# mail: jphome98@gmail.com")
+		call append(line(".")+3, "\# Created Time: ".strftime("%c"))
+		call append(line(".")+4, "\#########################################################################")
+		call append(line(".")+5, "\#!/bin/bash")
+		call append(line(".")+6, "")
     elseif &filetype == 'python'
         call setline(1,"#!/usr/bin/env python")
         call append(line("."),"#coding=utf-8")
-		call append(line(".")+1, "") 
+		call append(line(".")+1, "")
     elseif &filetype == 'mkd'
         call setline(1,"<head><meta charset=\"UTF-8\"></head>")
-	else 
-		call setline(1, "/*************************************************************************") 
-		call append(line("."), "	> File Name: ".expand("%")) 
-		call append(line(".")+1, "	> Author: ma6174") 
-		call append(line(".")+2, "	> Mail: ma6174@163.com ") 
-		call append(line(".")+3, "	> Created Time: ".strftime("%c")) 
-		call append(line(".")+4, " ************************************************************************/") 
-		call append(line(".")+5, "")
+	else
+		call setline(1, "/**")
+		call append(line("."),   " * @file   ".expand("%"))
+		call append(line(".")+1, " * @author jphome <jphome98@gmail.com>")
+        call append(line(".")+2, " * @date   ".strftime("%c"))
+		call append(line(".")+3, " *")
+		call append(line(".")+4, " * @brief ")
+		call append(line(".")+5, " *")
+		call append(line(".")+6, " *")
+		call append(line(".")+7, " */")
+        call append(line(".")+8, "")
 	endif
 	if &filetype == 'cpp'
-		call append(line(".")+6, "#include<iostream>")
-		call append(line(".")+7, "using namespace std;")
-		call append(line(".")+8, "")
+		call append(line(".")+9,  "#include <iostream>")
+		call append(line(".")+10, "using namespace std;")
+		call append(line(".")+11, "")
 	endif
 	if &filetype == 'c'
-		call append(line(".")+6, "#include<stdio.h>")
-		call append(line(".")+7, "")
+		call append(line(".")+9,  "#include <stdio.h>")
+		call append(line(".")+10, "")
 	endif
 "	if &filetype == 'java'
 "		call append(line(".")+6,"public class ".expand("%"))
 "		call append(line(".")+7,"")
 "	endif
-	"新建文件后，自动定位到文件末尾
-endfunc 
+endfunc
+" 新建文件后，自动定位到文件末尾
 autocmd BufNewFile * normal G
 
 
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"键盘命令
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""
+" 键盘命令
+"""""""""""""""""""
 :nmap <silent> <F9> <ESC>:Tlist<RETURN>
 map! <C-Z> <Esc>zzi
 map! <C-O> <C-Y>,
@@ -135,21 +174,15 @@ map <F12> gg=G
 " 选中状态下 Ctrl+c 复制
 map <C-v> "*pa
 imap <C-v> <Esc>"*pa
-imap <C-a> <Esc>^
-imap <C-e> <Esc>$
 vmap <C-c> "+y
 set mouse=v
-"set clipboard=unnamed
-"去空行  
-nnoremap <F2> :g/^\s*$/d<CR> 
-"比较文件  
-nnoremap <C-F2> :vert diffsplit 
-"列出当前目录文件  
-map <F3> :tabnew .<CR>  
-"打开树状文件目录  
-map <C-F3> \be  
+" set clipboard=unnamed
+" 列出当前目录文件
+map <F3> :tabnew .<CR>
+" 打开树状文件目录
+map <C-F3> \be
 :autocmd BufRead,BufNewFile *.dot map <F5> :w<CR>:!dot -Tjpg -o %<.jpg % && eog %<.jpg  <CR><CR> && exec "redr!"
-"C，C++ 按F5编译运行
+" C，C++ 按F5编译运行
 map <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
 	exec "w"
@@ -159,8 +192,8 @@ func! CompileRunGcc()
 	elseif &filetype == 'cpp'
 		exec "!g++ % -o %<"
 		exec "!time ./%<"
-	elseif &filetype == 'java' 
-		exec "!javac %" 
+	elseif &filetype == 'java'
+		exec "!javac %"
 		exec "!time java %<"
 	elseif &filetype == 'sh'
 		:!time bash %
@@ -179,7 +212,7 @@ func! CompileRunGcc()
         exec "!firefox /tmp/markdown.html &"
 	endif
 endfunc
-"C,C++的调试
+" C,C++的调试
 map <F8> :call Rungdb()<CR>
 func! Rungdb()
 	exec "w"
@@ -189,13 +222,9 @@ endfunc
 
 
 
-
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""实用设置
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""
+" 实用设置
+"""""""""""""""""
 if has("autocmd")
       autocmd BufReadPost *
           \ if line("'\"") > 0 && line("'\"") <= line("$") |
@@ -207,34 +236,33 @@ endif
 set autoread
 " quickfix模式
 autocmd FileType c,cpp map <buffer> <leader><space> :w<cr>:make<cr>
-"代码补全 
-set completeopt=preview,menu 
-"允许插件  
+" 代码补全
+set completeopt=preview,menu
+" 允许插件
 filetype plugin on
-"共享剪贴板  
-"set clipboard+=unnamed 
-"自动保存
+" 共享剪贴板
+" set clipboard+=unnamed
+" 自动保存
 set autowrite
 set ruler                   " 打开状态栏标尺
 set cursorline              " 突出显示当前行
 set magic                   " 设置魔术
 set guioptions-=T           " 隐藏工具栏
 set guioptions-=m           " 隐藏菜单栏
-""set foldcolumn=0
-""set foldmethod=indent 
-""set foldlevel=3 
+" set foldcolumn=0
+" set foldmethod=indent
+" set foldlevel=3
 " 不要使用vi的键盘模式，而是vim自己的
 set nocompatible
 " 去掉输入错误的提示声音
 set noeb
 " 在处理未保存或只读文件的时候，弹出确认
 set confirm
-"禁止生成临时文件
+" 禁止生成临时文件
 set nobackup
 set noswapfile
-"搜索忽略大小写
+" 搜索忽略大小写
 set ignorecase
-
 
 
 
@@ -261,7 +289,7 @@ set matchtime=1
 set scrolloff=3
 " 为C程序提供自动缩进
 set smartindent
-"自动补全
+" 自动补全
 "":inoremap ( ()<ESC>i
 "":inoremap ) <c-r>=ClosePair(')')<CR>
 ":inoremap { {<CR>}<ESC>O
@@ -277,63 +305,50 @@ set smartindent
 ""		return a:char
 ""	endif
 ""endfunction
-filetype plugin indent on 
-"打开文件类型检测, 加了这句才可以用智能补全
+filetype plugin indent on
+" 打开文件类型检测, 加了这句才可以用智能补全
 set completeopt=longest,menu
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CTags的设定  
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let Tlist_Sort_Type = "name"    " 按照名称排序  
-let Tlist_Use_Right_Window = 1  " 在右侧显示窗口  
-let Tlist_Compart_Format = 1    " 压缩方式  
-let Tlist_Exist_OnlyWindow = 1  " 如果只有一个buffer，kill窗口也kill掉buffer  
-""let Tlist_File_Fold_Auto_Close = 0  " 不要关闭其他文件的tags  
-""let Tlist_Enable_Fold_Column = 0    " 不要显示折叠树  
+
+
+
+""""""""""""""""
+" CTags的设定
+""""""""""""""""
+let Tlist_Sort_Type = "name"    " 按照名称排序
+let Tlist_Use_Right_Window = 1  " 在右侧显示窗口
+let Tlist_Compart_Format = 1    " 压缩方式
+let Tlist_Exist_OnlyWindow = 1  " 如果只有一个buffer，kill窗口也kill掉buffer
+"let Tlist_File_Fold_Auto_Close = 0  " 不要关闭其他文件的tags
+"let Tlist_Enable_Fold_Column = 0    " 不要显示折叠树
 "let Tlist_Show_One_File=1            "不同时显示多个文件的tag，只显示当前文件的
-"设置tags  
-"set tags=tags  
-"set autochdir 
+" 设置tags
+"set tags=tags
+"set autochdir
 
 
 
-
-
-
-
-
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"其他东东
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"默认打开Taglist 
-let Tlist_Auto_Open=1 
-"""""""""""""""""""""""""""""" 
-" Tag list (ctags) 
-"""""""""""""""""""""""""""""""" 
-let Tlist_Ctags_Cmd = '/usr/local/bin/ctags' 
-let Tlist_Show_One_File = 1 "不同时显示多个文件的tag，只显示当前文件的 
-let Tlist_Exit_OnlyWindow = 1 "如果taglist窗口是最后一个窗口，则退出vim 
+"""""""""""""""""""""""
+" 其他东东
+"""""""""""""""""""""""
+" 默认打开Taglist
+let Tlist_Auto_Open=1
+"""""""""""""""""""""""
+" Tag list (ctags)
+"""""""""""""""""""""""
+set shell=/bin/sh
+let Tlist_Ctags_Cmd = '/usr/bin/ctags'
+let Tlist_Show_One_File = 1 "不同时显示多个文件的tag，只显示当前文件的
+let Tlist_Exit_OnlyWindow = 1 "如果taglist窗口是最后一个窗口，则退出vim
 let Tlist_Use_Right_Window = 1 "在右侧窗口中显示taglist窗口
 " minibufexpl插件的一般设置
 let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
-let g:miniBufExplModSelTarget = 1  
+let g:miniBufExplModSelTarget = 1
 
 
 
-
-
-
-
-
-
-
-
-
-"输入法
+" 输入法
 :let g:vimim_map='c-/'
 ":let g:vimim_cloud='sougou' " QQ云输入
 :let g:vimim_punctuation=0	" 不用中文标点
@@ -341,7 +356,8 @@ let g:miniBufExplModSelTarget = 1
 :let g:vimim_cloud=-1
 
 
-"python补全
+
+" python补全
 let g:pydiction_location = '~/.vim/after/complete-dict'
 let g:pydiction_menu_height = 20
 let Tlist_Ctags_Cmd='/usr/local/bin/ctags'
@@ -349,7 +365,6 @@ let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
 let g:miniBufExplModSelTarget = 1
-
 
 
 
@@ -370,31 +385,31 @@ autocmd FileType python set omnifunc=pythoncomplete#Complete
 "filetype off                   " required!
 
 set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+"call vundle#rc()
 
 " let Vundle manage Vundle
-" required! 
-Bundle 'gmarik/vundle'
+" required!
+" Bundle 'gmarik/vundle'
 
 " My Bundles here:
 "
 " original repos on github
-Bundle 'tpope/vim-fugitive'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
+"Bundle 'tpope/vim-fugitive'
+"Bundle 'Lokaltog/vim-easymotion'
+"Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
 "ndle 'tpope/vim-rails.git'
 " vim-scripts repos
-Bundle 'L9'
-Bundle 'FuzzyFinder'
+"Bundle 'L9'
+"Bundle 'FuzzyFinder'
 " non github repos
-Bundle 'git://git.wincent.com/command-t.git'
-Bundle 'Auto-Pairs'
-Bundle 'python-imports.vim'
-Bundle 'CaptureClipboard'
-Bundle 'ctrlp-modified.vim'
-Bundle 'last_edit_marker.vim'
+"Bundle 'git://git.wincent.com/command-t.git'
+"Bundle 'Auto-Pairs'
+"Bundle 'python-imports.vim'
+"Bundle 'CaptureClipboard'
+"Bundle 'ctrlp-modified.vim'
+"Bundle 'last_edit_marker.vim'
 "Bundle 'Python-mode-klen'
-Bundle 'SQLComplete.vim'
+"Bundle 'SQLComplete.vim'
 "Bundle 'djangojump'
 " ...
 
@@ -408,3 +423,67 @@ filetype plugin indent on     " required!
 "
 " see :h vundle for more details or wiki for FAQ
 " NOTE: comments after Bundle command are not allowed..
+
+
+
+" nnoremap hw :call InsertFileHead()<cr>
+func! InsertFileHead()
+		call setline(1, "/**")
+		call append(line("."),   " * @file   ".expand("%"))
+		call append(line(".")+1, " * @author jphome <jphome98@gmail.com>")
+        call append(line(".")+2, " * @date   ".strftime("%c"))
+		call append(line(".")+3, " *")
+		call append(line(".")+4, " * @brief ")
+		call append(line(".")+5, " *")
+		call append(line(".")+6, " *")
+		call append(line(".")+7, " */")
+        call append(line(".")+8, "")
+        normal 6G
+        normal A
+endfunc
+
+
+
+" Platform
+" call: if MySys() == 'windows'
+"       elseif MySys() == 'linux'
+function! MySys()
+  if has("win32")
+    return "windows"
+  else
+    return "linux"
+  endif
+endfunction
+
+
+
+
+""""""""""""""""""
+" Emacs shortcut
+""""""""""""""""""
+imap <C-g> <Esc>l
+map <C-g> <Esc>
+cmap <C-g> <Esc>
+
+imap <C-b> <Esc>i
+imap <C-f> <Esc>la
+imap <C-e> <Esc>$a
+imap <C-a> <Esc>^i
+
+imap <C-k> <Esc>lDA
+
+imap <C-v> <Esc><C-f>A
+imap <C-d> <Esc>ls
+
+
+""""""""""""""""
+" tmux shortcut
+""""""""""""""""
+nmap <C-w>% :vsplit<CR>
+nmap <C-w>" :split<CR>
+nmap <C-w>0 :q!<CR>
+
+
+map <leader>w :w<CR>
+map <leader>q :q!<CR>
+
