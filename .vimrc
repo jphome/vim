@@ -1,4 +1,52 @@
+"""""""""""""""""""""""""""""""""""
+" Platform
+"""""""""""""""""""""""""""""""""""
+" call: if MySys() == 'windows'
+"       elseif MySys() == 'linux'
+"""""""""""""""""""""""""""""""""""
+function! MySys()
+  if has("win32")
+    return "windows"
+  else
+    return "linux"
+  endif
+endfunction
 
+
+"""""""""""""""""""""""""""
+" 使用Vundle来管理Vundle
+"""""""""""""""""""""""""""
+" 启用vundle
+set nocompatible
+" 关闭文件类型检测
+filetype off
+set rtp+=~/.vim/bundle/vundle
+call vundle#rc()
+
+" 需要安装的插件
+" 格式1：Github上其他用户的仓库（非vim-scripts账户里的仓库，所以要加Github用户名）
+"Bundle 'tpope/vim-rails.git'
+" 格式2：vim-scripts里面的仓库，直接打仓库名即可。
+Bundle 'gmarik/vundle'
+Bundle 'taglist.vim'
+Bundle 'bufexplorer.zip'
+Bundle 'winmanager'
+Bundle 'genutils'
+Bundle 'lookupfile'
+" 格式3：非Github的Git仓库
+Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
+
+" 添加文件类型检测
+filetype plugin indent on
+
+" Vundle常用指令
+" :BundleList 列出已经安装的插件
+" :BundleInstall 安装所有配置文件中的插件
+" :BundleInstall! 更新所有插件
+" :BundleSearch 搜索插件
+" :BundleClean! 根据配置文件删除插件
+
+" NOTE: comments after Bundle command are not allowed..
 set rtp+=$GOROOT/misc/vim
 
 
@@ -22,6 +70,18 @@ set sessionoptions+=unix
 """""""""""""""""""""""""""
 " 显示相关
 """""""""""""""""""""""""""
+" 修改光标形状
+" For Konsole in KDE4
+" Vim进入插入模式，它将发送't_SI'转义序列
+" Vim离开插入模式，发送't_EI'
+"let &t_SI = "\]50;CursorShape=1\x7"
+"let &t_EI = "\]50;CursorShape=0\x7"
+" For Gnome Terminal
+if has("autocmd")
+	au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
+	au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+endif
+
 " 高亮光标所在行
 set cul
 " 启动的时候不显示那个援助乌干达儿童的提示
@@ -29,11 +89,8 @@ set shortmess=atI
 " 不要图形按钮
 set go=
 " 设置背景主题
-" color desert
-" 设置背景主题
+color desert	" night
 color ron
-" 设置背景主题
-" color torte
 " 设置字体
 "set guifont=Courier_New:h10:cANSI
 " 用浅色高亮当前行
@@ -56,11 +113,6 @@ set laststatus=2
 "set foldmethod=manual
 "去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 set nocompatible
-" 显示中文帮助
-if version >= 603
-	set helplang=cn
-	set encoding=utf-8
-endif
 " 自动缩进
 set autoindent
 set cindent
@@ -80,11 +132,10 @@ set history=1000
 " 搜索逐字符高亮
 set hlsearch
 set incsearch
-" 语言设置
-set langmenu=zh_CN.UTF-8
-set helplang=cn
 " 把时间strftime()的语言格式设置为en
-:language time en_US.utf8
+if MySys() == "linux"
+	:language time en_US.utf8
+endif
 " 总是显示状态行
 set cmdheight=2
 " 侦测文件类型
@@ -166,11 +217,6 @@ autocmd BufNewFile * normal G
 """""""""""""""""""
 " 键盘命令
 """""""""""""""""""
-:nmap <silent> <F9> <ESC>:Tlist<RETURN>
-map! <C-Z> <Esc>zzi
-map! <C-O> <C-Y>,
-map <C-A> ggVG$"+y
-map <F12> gg=G
 " 选中状态下 Ctrl+c 复制
 map <C-v> "*pa
 imap <C-v> <Esc>"*pa
@@ -274,7 +320,7 @@ set backspace=2
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
-set mouse=a
+"set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 " 通过使用: commands命令，告诉我们文件的哪一行被改变过
@@ -311,41 +357,83 @@ set completeopt=longest,menu
 
 
 
-""""""""""""""""
-" CTags的设定
-""""""""""""""""
-let Tlist_Sort_Type = "name"    " 按照名称排序
-let Tlist_Use_Right_Window = 1  " 在右侧显示窗口
-let Tlist_Compart_Format = 1    " 压缩方式
-let Tlist_Exist_OnlyWindow = 1  " 如果只有一个buffer，kill窗口也kill掉buffer
-"let Tlist_File_Fold_Auto_Close = 0  " 不要关闭其他文件的tags
-"let Tlist_Enable_Fold_Column = 0    " 不要显示折叠树
-"let Tlist_Show_One_File=1            "不同时显示多个文件的tag，只显示当前文件的
-" 设置tags
-"set tags=tags
-"set autochdir
+
 
 
 
 """""""""""""""""""""""
-" 其他东东
+" Taglist (ctags)
 """""""""""""""""""""""
-" 默认打开Taglist
-let Tlist_Auto_Open=1
+map <silent> <F9> <ESC>:Tlist<CR>
+if MySys() == "windows"
+	"let Tlist_Ctags_Cmd = 'ctags'
+elseif MySys() == "linux"
+	set shell=/bin/bash
+	let Tlist_Ctags_Cmd = '/usr/bin/ctags'
+endif
+let Tlist_Auto_Open = 0				" 启动vim不自动开启tlist
+let Tlist_Show_One_File = 0			" 同时显示多个文件的tag，只显示当前文件的
+let Tlist_File_Fold_Auto_Close = 1	" 同时显示多文件tag时，折叠其他文件的tag
+let Tlist_Exit_OnlyWindow = 1		" 如果taglist窗口是最后一个窗口，则退出vim
+let Tlist_Use_Left_Window = 1		" 在右侧窗口中显示taglist窗口
+let Tlist_WinWidth = 25
+
+""""""""""""""""""""""""
+" netrw-browse
+" ,fe  打开netrw
+""""""""""""""""""""""""
+let g:netrw_winsize = 20
+nmap <silent> <leader>fe :Sexplore!<CR>
+"let
 """""""""""""""""""""""
-" Tag list (ctags)
+" BufExplorer
+" ,bv   打开buf
 """""""""""""""""""""""
-set shell=/bin/sh
-let Tlist_Ctags_Cmd = '/usr/bin/ctags'
-let Tlist_Show_One_File = 1 "不同时显示多个文件的tag，只显示当前文件的
-let Tlist_Exit_OnlyWindow = 1 "如果taglist窗口是最后一个窗口，则退出vim
-let Tlist_Use_Right_Window = 1 "在右侧窗口中显示taglist窗口
+let g:bufExplorerDefaultHelp=0          " Do not show default help.
+let g:bufExplorerShowRelativePath=1     " Show relative paths.
+let g:bufExplorerSortBy='mru'           " Sort by most recently used.
+let g:bufExplorerSplitRight=0           " Split left.
+let g:bufExplorerSplitVertical=1        " Split vertically.
+let g:bufExplorerSplitVertSize = 30     " Split width
+let g:bufExplorerUseCurrentWindow=1     " Open in new window.
+let g:bufExplorerHorzSize=6
+autocmd BufWinEnter \[Buf\ List\] setl nonumber
+
+"""""""""""""""""""""""
+" winmanager
+"""""""""""""""""""""""
+let g:winManagerWindowLayout = "BufExplorer,FileExplorer|TagList"
+let g:winManagerWidth = 30
+let g:defaultExplorer = 0
+nmap <C-w>1 :FirstExplorerWindow<CR>
+nmap <C-w>2 :BottomExplorerWindow<CR>
+nmap <silent> <leader>bb :WMToggle<CR>
+
+"""""""""""""""""""""""
+" lookupfile
+"""""""""""""""""""""""
+let g:LookupFile_MinPatLength = 2               " 最少输入2个字符才开始查找
+let g:LookupFile_PreserveLastPattern = 0        " 不保存上次查找的字符串
+let g:LookupFile_PreservePatternHistory = 1     " 保存查找历史
+let g:LookupFile_AlwaysAcceptFirst = 1          " 回车打开第一个匹配项目
+let g:LookupFile_AllowNewFiles = 0              " 不允许创建不存在的文件
+if filereadable("./filenametags")               " 设置tag文件的名字
+   let g:LookupFile_TagExpr = '"./filenametags"'
+endif
+nmap <silent> <leader>lk <Plug>LookupFile<CR>
+nmap <silent> <leader>ll :LUBufs<CR>
+nmap <silent> <leader>lw :LUWalk<CR>
+
+
+
+
+
 " minibufexpl插件的一般设置
 let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
 let g:miniBufExplModSelTarget = 1
-
+" let g:miniBufExplorerMoreThanOne = 0
 
 
 " 输入法
@@ -360,7 +448,6 @@ let g:miniBufExplModSelTarget = 1
 " python补全
 let g:pydiction_location = '~/.vim/after/complete-dict'
 let g:pydiction_menu_height = 20
-let Tlist_Ctags_Cmd='/usr/local/bin/ctags'
 let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
@@ -368,61 +455,21 @@ let g:miniBufExplModSelTarget = 1
 
 
 
+set helplang=cn
 set iskeyword+=.
-set fileencodings=utf-8
-set termencoding=utf-8
-set encoding=utf8
+set fileencodings=utf8
+set termencoding=utf8
+"set encoding=utf8
 set fileencoding=utf8
 set fileencodings=utf8,ucs-bom,gbk,cp936,gb2312,gb18030
 let &termencoding=&encoding
-
+source $VIMRUNTIME/delmenu.vim
+source $VIMRUNTIME/menu.vim
 
 
 autocmd FileType python set omnifunc=pythoncomplete#Complete
 
 
-"set nocompatible               " be iMproved
-"filetype off                   " required!
-
-set rtp+=~/.vim/bundle/vundle/
-"call vundle#rc()
-
-" let Vundle manage Vundle
-" required!
-" Bundle 'gmarik/vundle'
-
-" My Bundles here:
-"
-" original repos on github
-"Bundle 'tpope/vim-fugitive'
-"Bundle 'Lokaltog/vim-easymotion'
-"Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
-"ndle 'tpope/vim-rails.git'
-" vim-scripts repos
-"Bundle 'L9'
-"Bundle 'FuzzyFinder'
-" non github repos
-"Bundle 'git://git.wincent.com/command-t.git'
-"Bundle 'Auto-Pairs'
-"Bundle 'python-imports.vim'
-"Bundle 'CaptureClipboard'
-"Bundle 'ctrlp-modified.vim'
-"Bundle 'last_edit_marker.vim'
-"Bundle 'Python-mode-klen'
-"Bundle 'SQLComplete.vim'
-"Bundle 'djangojump'
-" ...
-
-filetype plugin indent on     " required!
-"
-" Brief help
-" :BundleList          - list configured bundles
-" :BundleInstall(!)    - install(update) bundles
-" :BundleSearch(!) foo - search(or refresh cache first) for foo
-" :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
-"
-" see :h vundle for more details or wiki for FAQ
-" NOTE: comments after Bundle command are not allowed..
 
 
 
@@ -444,16 +491,8 @@ endfunc
 
 
 
-" Platform
-" call: if MySys() == 'windows'
-"       elseif MySys() == 'linux'
-function! MySys()
-  if has("win32")
-    return "windows"
-  else
-    return "linux"
-  endif
-endfunction
+
+
 
 
 
@@ -461,29 +500,41 @@ endfunction
 """"""""""""""""""
 " Emacs shortcut
 """"""""""""""""""
-imap <C-g> <Esc>l
+noremap <C-g> <Esc>
+nmap <C-g> <Esc>
 map <C-g> <Esc>
+imap <C-g> <Esc>l
 cmap <C-g> <Esc>
+vmap <C-g> <Esc>
 
-imap <C-b> <Esc>i
-imap <C-f> <Esc>la
-imap <C-e> <Esc>$a
-imap <C-a> <Esc>^i
+imap <C-b> <left>
+imap <C-f> <right>
+imap <C-e> <end>
+imap <C-a> <home>
+
+imap <C-v> <pagedown>
+"imap <A-v> <pageup>
 
 imap <C-k> <Esc>lDA
-
-imap <C-v> <Esc><C-f>A
-imap <C-d> <Esc>ls
+imap <C-d> <del>
 
 
 """"""""""""""""
 " tmux shortcut
 """"""""""""""""
-nmap <C-w>% :vsplit<CR>
+imap <C-w>% :vsplit<CR>
 nmap <C-w>" :split<CR>
+nmap <C-w>o <C-w>w
 nmap <C-w>0 :q!<CR>
 
-
 map <leader>w :w<CR>
-map <leader>q :q!<CR>
+map <leader>q :q<CR>
+
+
+""""""""""""""""""""
+" workspace
+""""""""""""""""""""
+if filereadable("workspace.vim")
+	source workspace.vim
+endif
 
