@@ -33,6 +33,7 @@ Bundle 'bufexplorer.zip'
 Bundle 'winmanager'
 Bundle 'genutils'
 Bundle 'lookupfile'
+Bundle 'fcitx.vim'
 " 格式3：非Github的Git仓库
 Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
 
@@ -178,8 +179,9 @@ func! SetTitle()
 		call append(line(".")+6, "")
     elseif &filetype == 'python'
         call setline(1,"#!/usr/bin/env python")
-        call append(line("."),"#coding=utf-8")
-		call append(line(".")+1, "")
+        call append(line("."),"# -*- coding=utf-8 -*-")
+		call append(line(".")+1, "# Filename: ")
+		call append(line(".")+2, "")
     elseif &filetype == 'mkd'
         call setline(1,"<head><meta charset=\"UTF-8\"></head>")
 	else
@@ -320,7 +322,7 @@ set backspace=2
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
-"set mouse=a
+set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 " 通过使用: commands命令，告诉我们文件的哪一行被改变过
@@ -522,8 +524,10 @@ imap <C-d> <del>
 """"""""""""""""
 " tmux shortcut
 """"""""""""""""
+nmap <C-w>% :vsplit<CR>
 imap <C-w>% :vsplit<CR>
 nmap <C-w>" :split<CR>
+imap <C-w>" "split<CR>
 nmap <C-w>o <C-w>w
 nmap <C-w>0 :q!<CR>
 
