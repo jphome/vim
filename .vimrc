@@ -16,6 +16,13 @@ endfunction
 """""""""""""""""""""""""""
 " 使用Vundle来管理Vundle
 """""""""""""""""""""""""""
+" Vundle常用指令
+" :BundleList 列出已经安装的插件
+" :BundleInstall 安装所有配置文件中的插件
+" :BundleInstall! 更新所有插件
+" :BundleSearch 搜索插件
+" :BundleClean! 根据配置文件删除插件
+
 " 启用vundle
 set nocompatible
 " 关闭文件类型检测
@@ -23,7 +30,7 @@ filetype off
 set rtp+=~/.vim/bundle/vundle
 call vundle#rc()
 
-" 需要安装的插件
+" 需要安装的插件 三种格式
 " 格式1：Github上其他用户的仓库（非vim-scripts账户里的仓库，所以要加Github用户名）
 "Bundle 'tpope/vim-rails.git'
 " 格式2：vim-scripts里面的仓库，直接打仓库名即可。
@@ -40,12 +47,6 @@ Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
 " 添加文件类型检测
 filetype plugin indent on
 
-" Vundle常用指令
-" :BundleList 列出已经安装的插件
-" :BundleInstall 安装所有配置文件中的插件
-" :BundleInstall! 更新所有插件
-" :BundleSearch 搜索插件
-" :BundleClean! 根据配置文件删除插件
 
 " NOTE: comments after Bundle command are not allowed..
 set rtp+=$GOROOT/misc/vim
@@ -53,6 +54,7 @@ set rtp+=$GOROOT/misc/vim
 
 " mapleader指定<leader>, 默认为\
 let mapleader = ","
+" 制定快捷键',ee'打开.vimrc
 map <silent> <leader>ee :e ~/.vimrc<cr>
 " .vimrc编辑保存后自动加载
 autocmd! bufwritepost .vimrc source ~/.vimrc
@@ -156,14 +158,16 @@ au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
 au BufRead,BufNewFile *.{go}   set filetype=go
 " rkdown to HTML
 nmap md :!~/.vim/markdown.pl % > %.html <CR><CR>
-nmap fi :!firefox %.html & <CR><CR>
-
-
+" 打开html文件,但需添加路径
+" nmap fi :!firefox %.html & <CR>
+" nmap fi :!google-chrome %.html & <CR>
 
 """""""""""""""""""
 " 新文件标题
 """""""""""""""""""
 " 新建.c,.h,.sh,.java文件，自动插入文件头
+" 打开html文件,但需添加路径
+" 打开html文件,但需添加路径
 autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java,*.py,*.md exec ":call SetTitle()"
 " 定义函数SetTitle，自动插入文件头
 func! SetTitle()
@@ -176,7 +180,8 @@ func! SetTitle()
 		call append(line(".")+3, "\# Created Time: ".strftime("%c"))
 		call append(line(".")+4, "\#########################################################################")
 		call append(line(".")+5, "\#!/bin/bash")
-		call append(line(".")+6, "")
+		call append(line(".")+6, "\# Filename: ")
+		call append(line(".")+7, "")
     elseif &filetype == 'python'
         call setline(1,"#!/usr/bin/env python")
         call append(line("."),"# -*- coding=utf-8 -*-")
@@ -322,7 +327,7 @@ set backspace=2
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
-set mouse=a
+"set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 " 通过使用: commands命令，告诉我们文件的哪一行被改变过
