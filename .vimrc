@@ -1,5 +1,5 @@
 """""""""""""""""""""""""""""""""""
-" Platform
+" 系统平台
 """""""""""""""""""""""""""""""""""
 " call: if MySys() == 'windows'
 "       elseif MySys() == 'linux'
@@ -14,7 +14,7 @@ endfunction
 
 
 """""""""""""""""""""""""""
-" 使用Vundle来管理Vundle
+" 使用Vundle来管理vim插件
 """""""""""""""""""""""""""
 " Vundle常用指令
 " :BundleList 列出已经安装的插件
@@ -24,34 +24,38 @@ endfunction
 " :BundleClean! 根据配置文件删除插件
 
 " 启用vundle
-set nocompatible
-" 关闭文件类型检测
-filetype off
 set rtp+=~/.vim/bundle/vundle
 call vundle#rc()
 
-" 需要安装的插件 三种格式
-" 格式1：Github上其他用户的仓库（非vim-scripts账户里的仓库，所以要加Github用户名）
-"Bundle 'tpope/vim-rails.git'
-" 格式2：vim-scripts里面的仓库，直接打仓库名即可。
+""" 需要安装的插件 三种格式
+"" 格式1：Github上其他用户的仓库（非vim-scripts账户里的仓库，所以要加Github用户名）
 Bundle 'gmarik/vundle'
+Bundle 'scrooloose/nerdcommenter'
+"" 格式2：vim-scripts里面的仓库，直接打仓库名即可。
 Bundle 'taglist.vim'
 Bundle 'bufexplorer.zip'
 Bundle 'winmanager'
 Bundle 'genutils'
 Bundle 'lookupfile'
+Bundle 'Pydiction'
+Bundle 'The-NERD-tree'
+Bundle 'NERD_Tree-and-ack'
+Bundle 'minibufexpl.vim'
+" 自动补全
+Bundle 'snipMate'
+" 插入模式下编辑模式切换->切换输入法
 Bundle 'fcitx.vim'
-" 格式3：非Github的Git仓库
+" python语法高亮
+Bundle 'python.vim'
+"" 格式3：非Github的Git仓库
 Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
 
-" 添加文件类型检测
+" 添加文件类型检测(关闭: filetype off)
 filetype plugin indent on
 
 
-" NOTE: comments after Bundle command are not allowed..
-set rtp+=$GOROOT/misc/vim
-
-
+" 使用vim自己的键盘模式
+set nocompatible
 " mapleader指定<leader>, 默认为\
 let mapleader = ","
 " 制定快捷键',ee'打开.vimrc
@@ -111,13 +115,19 @@ set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strf
 " 启动显示状态行(1),总是显示状态行(2)
 set laststatus=2
 " 允许折叠
+" zR打开所有折叠
+" zo打开当前折叠
 "set foldenable
-" 手动折叠
-"set foldmethod=manual
+" 关闭折叠
+set foldlevelstart=99
+" 按语法折叠
+"set foldmethod=syntax
 "去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 set nocompatible
 " 自动缩进
 set autoindent
+" 为C程序提供自动缩进
+set smartindent
 set cindent
 " Tab键的宽度
 set tabstop=4
@@ -128,7 +138,8 @@ set shiftwidth=4
 set noexpandtab
 " 在行和段开始处使用制表符
 set smarttab
-" 显示行号
+" 显示行号 :set number
+" 关闭显示 :set number!
 set number
 " 历史记录数
 set history=1000
@@ -151,16 +162,16 @@ filetype indent on
 set viminfo+=!
 " 带有如下符号的单词不要被换行分割
 set iskeyword+=_,$,@,%,#,-
-" 字符间插入的像素行数目
 
 " markdown配置
 au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}   set filetype=mkd
 au BufRead,BufNewFile *.{go}   set filetype=go
+au BufRead,BufNewFile *.{html} set filetype=html
 " rkdown to HTML
 nmap md :!~/.vim/markdown.pl % > %.html <CR><CR>
 " 打开html文件,但需添加路径
-" nmap fi :!firefox %.html & <CR>
 " nmap fi :!google-chrome %.html & <CR>
+
 
 """""""""""""""""""
 " 新文件标题
@@ -168,27 +179,71 @@ nmap md :!~/.vim/markdown.pl % > %.html <CR><CR>
 " 新建.c,.h,.sh,.java文件，自动插入文件头
 " 打开html文件,但需添加路径
 " 打开html文件,但需添加路径
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java,*.py,*.md exec ":call SetTitle()"
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java,*.py,*.pl,*.md,*.html exec ":call SetTitle()"
 " 定义函数SetTitle，自动插入文件头
 func! SetTitle()
 	" 如果文件类型为.sh文件
 	if &filetype == 'sh'
-		call setline(1,"\#########################################################################")
-		call append(line("."), "\# File Name: ".expand("%"))
-		call append(line(".")+1, "\# Author: jphome")
-		call append(line(".")+2, "\# mail: jphome98@gmail.com")
-		call append(line(".")+3, "\# Created Time: ".strftime("%c"))
-		call append(line(".")+4, "\#########################################################################")
-		call append(line(".")+5, "\#!/bin/bash")
-		call append(line(".")+6, "\# Filename: ")
+		call setline(1, "\#!/usr/bin/env sh")
+		call append(line("."), "\#########################################################################")
+		call append(line(".")+1, "\# File Name: ".expand("%"))
+		call append(line(".")+2, "\# Author: jphome")
+		call append(line(".")+3, "\# mail: jphome98@gmail.com")
+		call append(line(".")+4, "\# Created Time: ".strftime("%c"))
+		call append(line(".")+5, "\#########################################################################")
+		call append(line(".")+6, "")
 		call append(line(".")+7, "")
+	elseif &filetype == 'perl'
+		call setline(1, "\#!/usr/bin/env perl -w")
+		call append(line("."),"\#########################################################################")
+		call append(line(".")+1, "\# File Name: ".expand("%"))
+		call append(line(".")+2, "\# Author: jphome")
+		call append(line(".")+3, "\# mail: jphome98@gmail.com")
+		call append(line(".")+4, "\# Created Time: ".strftime("%c"))
+		call append(line(".")+5, "\#########################################################################")
+		call append(line(".")+6, "use strict;")
+		call append(line(".")+7, "use warnings;")
+		call append(line(".")+8, "")
+		call append(line(".")+9, "")
     elseif &filetype == 'python'
         call setline(1,"#!/usr/bin/env python")
-        call append(line("."),"# -*- coding=utf-8 -*-")
-		call append(line(".")+1, "# Filename: ")
-		call append(line(".")+2, "")
+        call append(line("."), "# -*- coding=utf-8 -*-")
+		call append(line(".")+1, "\#########################################################################")
+		call append(line(".")+2, "\# File Name: ".expand("%"))
+		call append(line(".")+3, "\# Author: jphome")
+		call append(line(".")+4, "\# mail: jphome98@gmail.com")
+		call append(line(".")+5, "\# Created Time: ".strftime("%c"))
+		call append(line(".")+6, "\#########################################################################")
+		call append(line(".")+7, "")
+		call append(line(".")+8, "")
     elseif &filetype == 'mkd'
-        call setline(1,"<head><meta charset=\"UTF-8\"></head>")
+        call setline(1,"---")
+        call append(line("."), "title: ")
+		call append(line(".")+1, "date: '".strftime("%Y-%m-%d %H:%M:%S")."'")
+		call append(line(".")+2, "permalink: ")
+		call append(line(".")+3, "description: ")
+		call append(line(".")+4, "categories: ")
+		call append(line(".")+5, "- ")
+		call append(line(".")+6, "- ")
+		call append(line(".")+7, "")
+		call append(line(".")+8, "tags: ")
+		call append(line(".")+9, "- ")
+		call append(line(".")+10, "---")
+		call append(line(".")+11, "")
+		call append(line(".")+12, "")
+	elseif &filetype == 'html'
+		call setline(1,"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">")
+		call append(line("."), "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"zh\" lang=\"zh\" dir=\"ltr\">")
+		call append(line(".")+1, "<head>")
+		call append(line(".")+2, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />")
+		call append(line(".")+3, "<title></title>")
+		call append(line(".")+4, "</head>")
+		call append(line(".")+5, "")
+		call append(line(".")+6, "<body>")
+		call append(line(".")+7, "")
+		call append(line(".")+8, "")
+		call append(line(".")+9, "</body>")
+		call append(line(".")+10, "</html>")
 	else
 		call setline(1, "/**")
 		call append(line("."),   " * @file   ".expand("%"))
@@ -235,7 +290,7 @@ map <F3> :tabnew .<CR>
 " 打开树状文件目录
 map <C-F3> \be
 :autocmd BufRead,BufNewFile *.dot map <F5> :w<CR>:!dot -Tjpg -o %<.jpg % && eog %<.jpg  <CR><CR> && exec "redr!"
-" C，C++ 按F5编译运行
+" 按F5编译运行
 map <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
 	exec "w"
@@ -258,13 +313,39 @@ func! CompileRunGcc()
 "        exec "!go build %<"
         exec "!time go run %"
     elseif &filetype == 'mkd'
+		call append(0, "---")
+		call append(1, "title: ")
+		call append(2, "date: '".strftime("%Y-%m-%d %H:%M:%S")."'")
+		call append(3, "permalink: ")
+		call append(4, "description: ")
+		call append(5, "categories: ")
+		call append(6, "- ")
+		call append(7, "- ")
+		call append(8, "")
+		call append(9, "tags:")
+		call append(10, "- ")
+		call append(11, "---")
+		call append(12, "")
+		call append(13, "")
+"        exec "!echo %"
 "        exec "!touch ~/temp.html"
 "        exec "!perl ~/.vim/markdown.pl % > /tmp/temp.html<"<CR>
 "        exec "!markdown % > /tmp/temp.html<"<CR>
 "        exec "md"
-        exec "!firefox /tmp/markdown.html &"
+"        exec "!firefox /tmp/markdown.html &"
 	endif
 endfunc
+
+" 需要事先设置blog_root环境变量
+map <C-F5> :call RunXxx()<CR>
+func! RunXxx()
+	exec "w"
+    if &filetype == 'mkd'
+		exec "!cp % $blog_root/posts"
+		exec "!cd $blog_root && gor compile"
+	endif
+endfunc
+
 " C,C++的调试
 map <F8> :call Rungdb()<CR>
 func! Rungdb()
@@ -305,8 +386,6 @@ set guioptions-=m           " 隐藏菜单栏
 " set foldcolumn=0
 " set foldmethod=indent
 " set foldlevel=3
-" 不要使用vi的键盘模式，而是vim自己的
-set nocompatible
 " 去掉输入错误的提示声音
 set noeb
 " 在处理未保存或只读文件的时候，弹出确认
@@ -327,7 +406,7 @@ set backspace=2
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
-"set mouse=a
+set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 " 通过使用: commands命令，告诉我们文件的哪一行被改变过
@@ -340,8 +419,6 @@ set showmatch
 set matchtime=1
 " 光标移动到buffer的顶部和底部时保持3行距离
 set scrolloff=3
-" 为C程序提供自动缩进
-set smartindent
 " 自动补全
 "":inoremap ( ()<ESC>i
 "":inoremap ) <c-r>=ClosePair(')')<CR>
@@ -369,7 +446,7 @@ set completeopt=longest,menu
 
 
 """""""""""""""""""""""
-" Taglist (ctags)
+" Taglist (ctags) tag列表
 """""""""""""""""""""""
 map <silent> <F9> <ESC>:Tlist<CR>
 if MySys() == "windows"
@@ -385,13 +462,15 @@ let Tlist_Exit_OnlyWindow = 1		" 如果taglist窗口是最后一个窗口，则�
 let Tlist_Use_Left_Window = 1		" 在右侧窗口中显示taglist窗口
 let Tlist_WinWidth = 25
 
+
 """"""""""""""""""""""""
-" netrw-browse
+" netrw-browse 文件浏览器
 " ,fe  打开netrw
 """"""""""""""""""""""""
 let g:netrw_winsize = 20
 nmap <silent> <leader>fe :Sexplore!<CR>
-"let
+
+
 """""""""""""""""""""""
 " BufExplorer
 " ,bv   打开buf
@@ -404,10 +483,13 @@ let g:bufExplorerSplitVertical=1        " Split vertically.
 let g:bufExplorerSplitVertSize = 30     " Split width
 let g:bufExplorerUseCurrentWindow=1     " Open in new window.
 let g:bufExplorerHorzSize=6
+let g:BufExplorerMaxHeight=30
 autocmd BufWinEnter \[Buf\ List\] setl nonumber
+
 
 """""""""""""""""""""""
 " winmanager
+" ,bb	打开窗口管理器
 """""""""""""""""""""""
 let g:winManagerWindowLayout = "BufExplorer,FileExplorer|TagList"
 let g:winManagerWidth = 30
@@ -416,8 +498,10 @@ nmap <C-w>1 :FirstExplorerWindow<CR>
 nmap <C-w>2 :BottomExplorerWindow<CR>
 nmap <silent> <leader>bb :WMToggle<CR>
 
+
 """""""""""""""""""""""
 " lookupfile
+" ,lk	找文件
 """""""""""""""""""""""
 let g:LookupFile_MinPatLength = 2               " 最少输入2个字符才开始查找
 let g:LookupFile_PreserveLastPattern = 0        " 不保存上次查找的字符串
@@ -432,9 +516,6 @@ nmap <silent> <leader>ll :LUBufs<CR>
 nmap <silent> <leader>lw :LUWalk<CR>
 
 
-
-
-
 " minibufexpl插件的一般设置
 let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
@@ -445,21 +526,16 @@ let g:miniBufExplModSelTarget = 1
 
 " 输入法
 :let g:vimim_map='c-/'
-":let g:vimim_cloud='sougou' " QQ云输入
 :let g:vimim_punctuation=0	" 不用中文标点
 :set pastetoggle=<C-H>
 :let g:vimim_cloud=-1
 
 
-
-" python补全
-let g:pydiction_location = '~/.vim/after/complete-dict'
+" python补全配置
+" Pydiction配置Tab
+au BufRead,BufNewFile *.{py,pyw} set filetype=python
+let g:pydiction_location = '~/.vim/bundle/Pydiction/complete-dict'
 let g:pydiction_menu_height = 20
-let g:miniBufExplMapWindowNavVim = 1
-let g:miniBufExplMapWindowNavArrows = 1
-let g:miniBufExplMapCTabSwitchBufs = 1
-let g:miniBufExplModSelTarget = 1
-
 
 
 set helplang=cn
@@ -477,66 +553,42 @@ source $VIMRUNTIME/menu.vim
 autocmd FileType python set omnifunc=pythoncomplete#Complete
 
 
-
-
-
-" nnoremap hw :call InsertFileHead()<cr>
-func! InsertFileHead()
-		call setline(1, "/**")
-		call append(line("."),   " * @file   ".expand("%"))
-		call append(line(".")+1, " * @author jphome <jphome98@gmail.com>")
-        call append(line(".")+2, " * @date   ".strftime("%c"))
-		call append(line(".")+3, " *")
-		call append(line(".")+4, " * @brief ")
-		call append(line(".")+5, " *")
-		call append(line(".")+6, " *")
-		call append(line(".")+7, " */")
-        call append(line(".")+8, "")
-        normal 6G
-        normal A
-endfunc
-
-
-
-
-
-
-
-
-
 """"""""""""""""""
-" Emacs shortcut
+" Emacs_style shortcut
 """"""""""""""""""
 noremap <C-g> <Esc>
-nmap <C-g> <Esc>
 map <C-g> <Esc>
+nmap <C-g> <Esc>
 imap <C-g> <Esc>l
 cmap <C-g> <Esc>
 vmap <C-g> <Esc>
+xmap <C-g> <Esc>
+omap <C-g> <Esc>
+lmap <C-g> <Esc>
 
 imap <C-b> <left>
 imap <C-f> <right>
 imap <C-e> <end>
 imap <C-a> <home>
 
-imap <C-v> <pagedown>
-"imap <A-v> <pageup>
-
 imap <C-k> <Esc>lDA
 imap <C-d> <del>
 
 
 """"""""""""""""
-" tmux shortcut
+" tmux_style shortcut
 """"""""""""""""
+" 竖向拆分窗口
 nmap <C-w>% :vsplit<CR>
-imap <C-w>% :vsplit<CR>
+" 横向拆分窗口
 nmap <C-w>" :split<CR>
-imap <C-w>" "split<CR>
+" 多窗口切换
 nmap <C-w>o <C-w>w
+" 关闭窗口
 nmap <C-w>0 :q!<CR>
-
+" 保存文件
 map <leader>w :w<CR>
+" 退出文件
 map <leader>q :q<CR>
 
 
